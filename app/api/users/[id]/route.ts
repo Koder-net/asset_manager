@@ -25,7 +25,7 @@ export async function PUT(
     if (typeof isActive === 'boolean') updateData.isActive = isActive;
     if (password) updateData.password = await bcrypt.hash(password, 12);
 
-    const user = await User.findByIdAndUpdate(id, updateData, { new: true }).select('-password');
+    const user = await User.findByIdAndUpdate(id, updateData, { returnDocument: 'after' }).select('-password');
     if (!user) return Response.json({ error: 'User not found' }, { status: 404 });
     return Response.json({ user });
   } catch {

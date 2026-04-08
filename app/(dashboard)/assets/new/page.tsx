@@ -3,6 +3,33 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Defined OUTSIDE the component so React never treats them as new types on re-render.
+// If defined inside, every keystroke (state update) creates a brand-new component
+// reference, causing React to unmount→remount them and drop input focus.
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="card p-6">
+      <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-primary)' }}>{title}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Field({
+  label, id, required, children
+}: { label: string; id: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div>
+      <label htmlFor={id} className="label">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 const CATEGORIES = ['Computer', 'Laptop', 'Printer', 'Scanner', 'Monitor', 'Furniture - Table', 'Furniture - Chair', 'Vehicle', 'Air Conditioner', 'Projector', 'Server', 'Network Equipment', 'Phone', 'Other'];
 const CONDITION_STATUSES = ['Excellent', 'Good', 'Fair', 'Poor', 'Damaged'];
 const ASSET_STATUSES = ['Active', 'In Storage', 'In Repair', 'Missing'];
@@ -84,25 +111,7 @@ export default function NewAssetPage() {
     }
   };
 
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="card p-6">
-      <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--color-primary)' }}>{title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {children}
-      </div>
-    </div>
-  );
 
-  const Field = ({
-    label, id, required, children
-  }: { label: string; id: string; required?: boolean; children: React.ReactNode }) => (
-    <div>
-      <label htmlFor={id} className="label">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      {children}
-    </div>
-  );
 
   return (
     <div>

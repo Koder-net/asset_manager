@@ -50,7 +50,7 @@ export async function PUT(
     const asset = await Asset.findByIdAndUpdate(
       id,
       { ...body, updatedBy: session.userId },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     await logAudit(session, 'UPDATE', 'Asset', {

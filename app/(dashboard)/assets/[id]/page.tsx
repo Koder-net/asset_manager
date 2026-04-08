@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -58,9 +57,6 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const [asset, setAsset] = useState<Asset | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showTransfer, setShowTransfer] = useState(false);
-  const [transfer, setTransfer] = useState({ transferType: 'branch', toValue: '', reason: '' });
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetch(`/api/assets/${id}`)
@@ -95,21 +91,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
     win.document.close();
   };
 
-  const handleTransfer = async () => {
-    if (!asset || !transfer.toValue) return;
-    setSubmitting(true);
-    const res = await fetch('/api/transfers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assetId: asset._id, ...transfer }),
-    });
-    if (res.ok) {
-      setShowTransfer(false);
-      const d = await fetch(`/api/assets/${id}`).then((r) => r.json());
-      setAsset(d.asset);
-    }
-    setSubmitting(false);
-  };
+
 
   if (loading) {
     return (
@@ -144,12 +126,12 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowTransfer(true)} className="btn-outline">
+          <Link href={`/transfers?assetId=${asset._id}`} className="btn-outline">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
             Transfer
-          </button>
+          </Link>
           <button onClick={handlePrintQR} className="btn-outline">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -233,63 +215,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {/* Transfer Modal */}
-      {showTransfer && (
-        <div className="modal-overlay" onClick={() => setShowTransfer(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--color-primary-dark)' }}>Transfer Asset</h2>
-              <button onClick={() => setShowTransfer(false)} className="text-gray-400 hover:text-gray-600">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="label">Transfer Type</label>
-                <select
-                  value={transfer.transferType}
-                  onChange={(e) => setTransfer((p) => ({ ...p, transferType: e.target.value }))}
-                  className="input-field"
-                >
-                  <option value="branch">Branch</option>
-                  <option value="department">Department</option>
-                  <option value="location">Location</option>
-                  <option value="custodian">Custodian</option>
-                </select>
-              </div>
-              <div>
-                <label className="label">Transfer To <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={transfer.toValue}
-                  onChange={(e) => setTransfer((p) => ({ ...p, toValue: e.target.value }))}
-                  className="input-field"
-                  placeholder="New value"
-                />
-              </div>
-              <div>
-                <label className="label">Reason</label>
-                <input
-                  type="text"
-                  value={transfer.reason}
-                  onChange={(e) => setTransfer((p) => ({ ...p, reason: e.target.value }))}
-                  className="input-field"
-                  placeholder="Reason for transfer"
-                />
-              </div>
-              <button
-                onClick={handleTransfer}
-                disabled={submitting || !transfer.toValue}
-                className="btn-primary w-full justify-center py-2.5"
-              >
-                {submitting ? 'Transferring…' : 'Confirm Transfer'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

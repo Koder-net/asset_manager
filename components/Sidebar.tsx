@@ -148,7 +148,19 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Nav links */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          // Exact match, OR starts with this href segment (e.g. /assets/ABC123 → Assets active)
+          // BUT only if no other nav item with a MORE specific href also matches —
+          // prevents /assets and /assets/new both lighting up at the same time.
+          const isActive =
+            pathname === item.href ||
+            (item.href !== '/dashboard' &&
+              pathname.startsWith(item.href + '/') &&
+              !navItems.some(
+                (other) =>
+                  other.href !== item.href &&
+                  other.href.length > item.href.length &&
+                  pathname.startsWith(other.href)
+              ));
           return (
             <Link
               key={item.href}
