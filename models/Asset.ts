@@ -1,13 +1,15 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Model, HydratedDocument } from 'mongoose';
 
-export interface IAsset extends Document {
+// Plain data interface — does NOT extend Document so there's no conflict
+// between our `model` field (device model name) and Mongoose's `.model()` method.
+export interface IAsset {
   _id: mongoose.Types.ObjectId;
   assetCode: string;
   qrCodeData: string;
   item_name: string;
   category: string;
   brand?: string;
-  model?: string;
+  model?: string;          // e.g. "Dell XPS 15" — would clash with Document.model()
   serial_number?: string;
   source?: string;
   supplier_name?: string;
@@ -32,26 +34,28 @@ export interface IAsset extends Document {
   updatedAt: Date;
 }
 
+export type AssetDocument = HydratedDocument<IAsset>;
+
 const AssetSchema = new Schema<IAsset>(
   {
-    assetCode: { type: String, required: true, unique: true, index: true },
-    qrCodeData: { type: String, required: true },
-    item_name: { type: String, required: true, trim: true },
-    category: { type: String, required: true, trim: true },
-    brand: { type: String, trim: true },
-    model: { type: String, trim: true },
-    serial_number: { type: String, trim: true },
-    source: { type: String, trim: true },
-    supplier_name: { type: String, trim: true },
-    invoice_number: { type: String, trim: true },
-    purchased_date: { type: Date },
-    received_date: { type: Date },
-    delivered_by: { type: String, trim: true },
-    brought_by: { type: String, trim: true },
-    branch: { type: String, required: true, trim: true },
-    department: { type: String, required: true, trim: true },
-    location: { type: String, required: true, trim: true },
-    custodian: { type: String, trim: true },
+    assetCode:        { type: String, required: true, unique: true, index: true },
+    qrCodeData:       { type: String, required: true },
+    item_name:        { type: String, required: true, trim: true },
+    category:         { type: String, required: true, trim: true },
+    brand:            { type: String, trim: true },
+    model:            { type: String, trim: true },
+    serial_number:    { type: String, trim: true },
+    source:           { type: String, trim: true },
+    supplier_name:    { type: String, trim: true },
+    invoice_number:   { type: String, trim: true },
+    purchased_date:   { type: Date },
+    received_date:    { type: Date },
+    delivered_by:     { type: String, trim: true },
+    brought_by:       { type: String, trim: true },
+    branch:           { type: String, required: true, trim: true },
+    department:       { type: String, required: true, trim: true },
+    location:         { type: String, required: true, trim: true },
+    custodian:        { type: String, trim: true },
     condition_status: {
       type: String,
       enum: ['Excellent', 'Good', 'Fair', 'Poor', 'Damaged'],
@@ -63,11 +67,11 @@ const AssetSchema = new Schema<IAsset>(
       default: 'Active',
     },
     warranty_end_date: { type: Date },
-    cost_value: { type: Number },
-    notes: { type: String, trim: true },
-    image: { type: String },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    cost_value:        { type: Number },
+    notes:             { type: String, trim: true },
+    image:             { type: String },
+    createdBy:         { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    updatedBy:         { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
