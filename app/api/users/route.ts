@@ -36,10 +36,11 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Email already exists' }, { status: 409 });
     }
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email: email.toLowerCase(), password: hashedPassword, role });
-    const userObj = user.toObject() as Record<string, unknown>;
-    delete userObj.password;
-    return Response.json({ user: userObj }, { status: 201 });
+    const user = await User.findById(
+      (await User.create({ name, email: email.toLowerCase(), password: hashedPassword, role }))._id,
+      '-password'
+    ).lean();
+    return Response.json({ user }, { status: 201 });
   } catch {
     return Response.json({ error: 'Server error' }, { status: 500 });
   }
