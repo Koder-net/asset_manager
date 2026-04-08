@@ -25,8 +25,8 @@ export async function logAudit(
       performedBy: session.userId,
       performedByName: session.name,
       performedByRole: session.role,
-      ipAddress: options.request?.headers.get('x-forwarded-for') || options.request?.headers.get('x-real-ip'),
-      userAgent: options.request?.headers.get('user-agent'),
+      ipAddress: options.request?.headers.get('x-forwarded-for') ?? options.request?.headers.get('x-real-ip') ?? undefined,
+      userAgent: options.request?.headers.get('user-agent') ?? undefined,
     });
   } catch (err) {
     console.error('Failed to log audit:', err);
