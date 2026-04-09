@@ -18,20 +18,65 @@ const CHART_COLORS = ['#334137', '#c9e268', '#4a5e52', '#a8c44a', '#6b7f6e', '#8
 export default function ReportsPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Export filters
+  const [filterBranch, setFilterBranch] = useState('');
+  const [filterDept, setFilterDept] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+
+  // Derived lists for filter dropdowns
+  const branches  = data?.byBranch.map((b) => b._id) ?? [];
+  const categories = data?.byCategory.map((b) => b._id) ?? [];
+  const statuses  = data?.byStatus.map((b) => b._id) ?? [];
 
   useEffect(() => {
-    fetch('/api/dashboard').then((r) => r.json()).then((d) => { setData(d); setLoading(false); });
+    fetch('/api/dashboard')
+      .then((r) => r.json())
+      .then((d) => { setData(d); setLoading(false); });
   }, []);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const params = new URLSearchParams();
+      if (filterBranch)   params.set('branch',     filterBranch);
+      if (filterDept)     params.set('department', filterDept);
+      if (filterStatus)   params.set('status',     filterStatus);
+      if (filterCategory) params.set('category',   filterCategory);
+
+      const res = await fetch(`/api/reports/export?${params.toString()}`);
+      if (!res.ok) throw new Error('Export failed');
+
+      const blob = await res.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `asset-report-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate report. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }} />
+      <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin"
+        style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }} />
     </div>
   );
 
   if (!data) return <div>Failed to load data</div>;
 
-  const Section = ({ title, data, color }: { title: string; data: { _id: string; count: number }[]; color?: string }) => (
+  const Section = ({ title, data }: { title: string; data: { _id: string; count: number }[] }) => (
     <div className="card p-5">
       <h2 className="text-sm font-semibold text-gray-700 mb-4">{title}</h2>
       <div className="space-y-2">
@@ -56,29 +101,125 @@ export default function ReportsPage() {
 
   return (
     <div>
+      {/* Page header */}
       <div className="page-header flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold" style={{ color: 'var(--color-primary-dark)' }}>Reports</h1>
           <p className="text-sm text-gray-500 mt-0.5">Asset analytics overview</p>
         </div>
-        <button
-          onClick={() => window.print()}
-          className="btn-outline"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          Print Report
-        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Filter toggle */}
+          <button
+            onClick={() => setShowFilters((v) => !v)}
+            className="btn-outline flex items-center gap-2"
+            title="Set export filters"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+            </svg>
+            Filters
+            {(filterBranch || filterDept || filterStatus || filterCategory) && (
+              <span className="inline-flex items-center justify-center w-4 h-4 text-xs rounded-full text-white"
+                style={{ background: 'var(--color-primary)' }}>
+                {[filterBranch, filterDept, filterStatus, filterCategory].filter(Boolean).length}
+              </span>
+            )}
+          </button>
+
+          {/* Excel export button */}
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="btn-primary flex items-center gap-2"
+            style={{ opacity: exporting ? 0.7 : 1 }}
+          >
+            {exporting ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating…
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M14.836 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9.164L14.836 2zM13 3.5L18.5 9H14a1 1 0 01-1-1V3.5zM9.5 11.5h5a.5.5 0 010 1h-5a.5.5 0 010-1zm0 3h5a.5.5 0 010 1h-5a.5.5 0 010-1zm0 3h3a.5.5 0 010 1h-3a.5.5 0 010-1z" />
+                </svg>
+                Export to Excel
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Filter panel */}
+      {showFilters && (
+        <div className="card p-4 mb-5 border-l-4" style={{ borderLeftColor: 'var(--color-primary)' }}>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-semibold text-gray-700">Export Filters <span className="text-xs font-normal text-gray-400">(leave blank to export all)</span></p>
+            {(filterBranch || filterDept || filterStatus || filterCategory) && (
+              <button
+                className="text-xs text-red-500 hover:underline"
+                onClick={() => { setFilterBranch(''); setFilterDept(''); setFilterStatus(''); setFilterCategory(''); }}
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Branch</label>
+              <select
+                className="input-field text-sm py-1.5"
+                value={filterBranch}
+                onChange={(e) => setFilterBranch(e.target.value)}
+              >
+                <option value="">All branches</option>
+                {branches.map((b) => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Department</label>
+              <input
+                className="input-field text-sm py-1.5"
+                placeholder="e.g. IT"
+                value={filterDept}
+                onChange={(e) => setFilterDept(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Status</label>
+              <select
+                className="input-field text-sm py-1.5"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+              >
+                <option value="">All statuses</option>
+                {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Category</label>
+              <select
+                className="input-field text-sm py-1.5"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+              >
+                <option value="">All categories</option>
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Total Assets', value: data.total, color: 'var(--color-primary)' },
-          { label: 'Categories', value: data.byCategory.length, color: '#4a5e52' },
-          { label: 'In Repair', value: data.inRepair, color: '#f59e0b' },
-          { label: 'Missing', value: data.missing, color: '#ef4444' },
+          { label: 'Total Assets',  value: data.total,            color: 'var(--color-primary)' },
+          { label: 'Categories',    value: data.byCategory.length, color: '#4a5e52' },
+          { label: 'In Repair',     value: data.inRepair,         color: '#f59e0b' },
+          { label: 'Missing',       value: data.missing,          color: '#ef4444' },
         ].map((s) => (
           <div key={s.label} className="stat-card">
             <p className="text-xs text-gray-500 mb-1">{s.label}</p>
@@ -105,8 +246,16 @@ export default function ReportsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <Section title="By Category" data={data.byCategory} />
-        <Section title="By Status" data={data.byStatus} />
+        <Section title="By Status"   data={data.byStatus} />
         <Section title="By Condition" data={data.byCondition} />
+      </div>
+
+      {/* Export hint */}
+      <div className="mt-6 p-4 rounded-xl border border-dashed text-center" style={{ borderColor: 'var(--color-primary)', background: '#f4f9ee' }}>
+        <p className="text-sm text-gray-600">
+          <span className="font-semibold" style={{ color: 'var(--color-primary-dark)' }}>📥 Excel Report</span> includes 4 sheets:
+          <em> Summary, Asset Details (with QR codes), Transfer History, Maintenance Records.</em>
+        </p>
       </div>
     </div>
   );
