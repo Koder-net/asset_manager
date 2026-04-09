@@ -197,6 +197,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Assets */}
+      {data.userRole && !['auditor', 'viewer'].includes(data.userRole) && (
       <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-700">Recent Assets</h2>
@@ -240,6 +241,7 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+      )}
     </div>
   );
 }
