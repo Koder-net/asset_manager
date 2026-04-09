@@ -56,12 +56,17 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const router = useRouter();
   const [asset, setAsset] = useState<Asset | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`/api/assets/${id}`)
       .then((r) => r.json())
-      .then((d) => { setAsset(d.asset); setLoading(false); });
+      .then((d) => { 
+        setAsset(d.asset);
+        setUserRole(d.userRole);
+        setLoading(false); 
+      });
   }, [id]);
 
   const handlePrintQR = () => {
@@ -126,24 +131,28 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/transfers?assetId=${asset._id}`} className="btn-outline">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-            </svg>
-            Transfer
-          </Link>
+          {userRole && !['auditor', 'viewer'].includes(userRole) && (
+            <Link href={`/transfers?assetId=${asset._id}`} className="btn-outline">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              Transfer
+            </Link>
+          )}
           <button onClick={handlePrintQR} className="btn-outline">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
             </svg>
             Print QR
           </button>
-          <Link href={`/assets/${asset.assetCode}/edit`} className="btn-primary">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-            Edit
-          </Link>
+          {userRole && !['auditor', 'viewer'].includes(userRole) && (
+            <Link href={`/assets/${asset.assetCode}/edit`} className="btn-primary">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Edit
+            </Link>
+          )}
         </div>
       </div>
 

@@ -10,14 +10,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     const { id } = await params;
     await connectDB();
     const asset = await Asset.findOne({
       $or: [{ _id: id.match(/^[0-9a-f]{24}$/i) ? id : null }, { assetCode: id }],
     });
     if (!asset) return Response.json({ error: 'Asset not found' }, { status: 404 });
-    return Response.json({ asset });
+    return Response.json({ asset, userRole: session.role });
   } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
