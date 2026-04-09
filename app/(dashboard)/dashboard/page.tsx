@@ -22,6 +22,7 @@ interface DashboardData {
   }[];
   inRepair: number;
   missing: number;
+  userRole?: string;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -80,12 +81,14 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold" style={{ color: 'var(--color-primary-dark)' }}>Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">Asset overview and key metrics</p>
         </div>
-        <Link href="/assets/new" className="btn-primary">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Asset
-        </Link>
+        {data.userRole && !['auditor', 'viewer'].includes(data.userRole) && (
+          <Link href="/assets/new" className="btn-primary">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Asset
+          </Link>
+        )}
       </div>
 
       {/* Stats */}

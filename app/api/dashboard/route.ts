@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   try {
-    await requireAuth();
+    const session = await requireAuth();
     await connectDB();
 
     const [
@@ -36,6 +36,7 @@ export async function GET() {
       recentAssets,
       inRepair,
       missing,
+      userRole: session.role,
     });
   } catch {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
