@@ -65,7 +65,12 @@ export async function POST(request: NextRequest) {
     const count = await Asset.countDocuments();
     const assetCode = generateAssetCode(body.category || 'GEN', count);
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Use the explicit env var first; fall back to the origin of the incoming
+    // request so QR codes always point to the actual deployment (Vercel, etc.)
+    // rather than a hardcoded localhost.
+    const appUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      `${request.nextUrl.protocol}//${request.nextUrl.host}`;
     const qrUrl = `${appUrl}/assets/${assetCode}`;
     const qrCodeData = await QRCode.toDataURL(qrUrl, {
       errorCorrectionLevel: 'H',
