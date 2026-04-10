@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Defined OUTSIDE the component so React never treats them as new types on re-render.
@@ -30,11 +30,8 @@ function Field({
   );
 }
 
-const CATEGORIES = ['Computer', 'Laptop', 'Printer', 'Scanner', 'Monitor', 'Furniture - Table', 'Furniture - Chair', 'Vehicle', 'Air Conditioner', 'Projector', 'Server', 'Network Equipment', 'Phone', 'Other'];
 const CONDITION_STATUSES = ['Excellent', 'Good', 'Fair', 'Poor', 'Damaged'];
 const ASSET_STATUSES = ['Active', 'In Storage', 'In Repair', 'Missing'];
-const BRANCHES = ['Head Office', 'Branch A', 'Branch B', 'Branch C', 'Regional Office'];
-const DEPARTMENTS = ['Administration', 'Finance', 'IT', 'HR', 'Operations', 'Legal', 'Procurement', 'Audit'];
 
 interface FormData {
   item_name: string;
@@ -72,6 +69,22 @@ export default function NewAssetPage() {
     condition_status: 'Good', asset_status: 'Active',
     warranty_end_date: '', cost_value: '', notes: '',
   });
+
+  const [options, setOptions] = useState<{
+    categories: string[];
+    departments: string[];
+    branches: string[];
+    branchesByDept: Record<string, string[]>;
+  }>({ categories: [], departments: [], branches: [], branchesByDept: {} });
+
+  useEffect(() => {
+    fetch('/api/assets/options')
+      .then(r => r.json())
+      .then(d => {
+        if (!d.error) setOptions(d);
+      })
+      .catch(console.error);
+  }, []);
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -137,10 +150,19 @@ export default function NewAssetPage() {
             <input id="item_name" type="text" required value={form.item_name} onChange={set('item_name')} className="input-field" placeholder="e.g. Dell Laptop" />
           </Field>
           <Field label="Category" id="category" required>
-            <select id="category" required value={form.category} onChange={set('category')} className="input-field">
-              <option value="">Select category</option>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
+            <input 
+              id="category" 
+              required 
+              list="category-options" 
+              value={form.category} 
+              onChange={set('category')} 
+              className="input-field" 
+              placeholder="Select or enter category" 
+              autoComplete="off"
+            />
+            <datalist id="category-options">
+              {options.categories.map((c) => <option key={c} value={c} />)}
+            </datalist>
           </Field>
           <Field label="Brand" id="brand">
             <input id="brand" type="text" value={form.brand} onChange={set('brand')} className="input-field" placeholder="e.g. Dell, HP" />
@@ -184,17 +206,36 @@ export default function NewAssetPage() {
         </Section>
 
         <Section title="Location & Assignment">
-          <Field label="Branch" id="branch" required>
-            <select id="branch" required value={form.branch} onChange={set('branch')} className="input-field">
-              <option value="">Select branch</option>
-              {BRANCHES.map((b) => <option key={b} value={b}>{b}</option>)}
-            </select>
-          </Field>
           <Field label="Department" id="department" required>
-            <select id="department" required value={form.department} onChange={set('department')} className="input-field">
-              <option value="">Select department</option>
-              {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
+            <input 
+              id="department" 
+              required 
+              list="department-options" 
+              value={form.department} 
+              onChange={set('department')} 
+              className="input-field" 
+              placeholder="Select or enter department" 
+              autoComplete="off"
+            />
+            <datalist id="department-options">
+              {options.departments.map((d) => <option key={d} value={d} />)}
+            </datalist>
+          </Field>
+          <Field label="Branch" id="branch" required>
+            <input 
+              id="branch" 
+              required 
+              list="branch-options" 
+              value={form.branch} 
+              onChange={set('branch')} 
+              className="input-field disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed" 
+              placeholder="Select or enter branch" 
+              disabled={!form.department}
+              autoComplete="off"
+            />
+            <datalist id="branch-options">
+              {(options.branchesByDept[form.department] || options.branches).map((b) => <option key={b} value={b} />)}
+            </datalist>
           </Field>
           <Field label="Location / Room" id="location" required>
             <input id="location" required type="text" value={form.location} onChange={set('location')} className="input-field" placeholder="e.g. Room 201, Block A" />
