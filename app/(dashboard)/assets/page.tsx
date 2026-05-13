@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 interface Asset {
   _id: string;
   assetCode: string;
+  serial_number: string;
   item_name: string;
   category: string;
   brand?: string;
@@ -184,7 +185,7 @@ export default function AssetsPage() {
                     </td>
                     <td className="p-4">
                       <Link href={`/assets/${asset.assetCode}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
-                        {asset.assetCode}
+                        {asset.serial_number}
                       </Link>
                     </td>
                     <td className="p-4 font-medium text-gray-800">{asset.item_name}</td>
