@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 interface MaintenanceRecord {
   _id: string;
-  asset: { assetCode: string; item_name: string };
+  asset: { assetCode: string; item_name: string, serial_number: string };
   maintenanceType: string;
   description: string;
   startDate: string;
@@ -19,6 +19,7 @@ interface AssetOption {
   _id: string;
   assetCode: string;
   item_name: string;
+  serial_number: string;
 }
 
 const STATUS_BADGE: Record<string, string> = {
@@ -122,7 +123,7 @@ export default function MaintenancePage() {
                 records.map((r) => (
                   <tr key={r._id} className="table-row-hover border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
                     <td className="p-4">
-                      <p className="font-mono text-xs font-medium" style={{ color: 'var(--color-primary)' }}>{r.asset?.assetCode}</p>
+                      <p className="font-mono text-xs font-medium" style={{ color: 'var(--color-primary)' }}>{r.asset?.serial_number}</p>
                       <p className="text-xs text-gray-500">{r.asset?.item_name}</p>
                     </td>
                     <td className="p-4">
@@ -159,7 +160,7 @@ export default function MaintenancePage() {
                 <label className="label">Asset <span className="text-red-500">*</span></label>
                 <select value={form.assetId} onChange={(e) => setForm((p) => ({ ...p, assetId: e.target.value }))} className="input-field">
                   <option value="">Select asset…</option>
-                  {assets.map((a) => <option key={a._id} value={a._id}>{a.assetCode} – {a.item_name}</option>)}
+                  {assets.map((a) => <option key={a._id} value={a._id}>{a.serial_number} – {a.item_name}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">

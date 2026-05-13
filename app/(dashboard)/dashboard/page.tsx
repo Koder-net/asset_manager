@@ -15,6 +15,7 @@ interface DashboardData {
   recentAssets: {
     assetCode: string;
     item_name: string;
+    serial_number: string;
     category: string;
     asset_status: string;
     branch: string;
@@ -221,7 +222,7 @@ export default function DashboardPage() {
                 <tr key={asset.assetCode} className="table-row-hover border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
                   <td className="py-3 pr-4">
                     <Link href={`/assets/${asset.assetCode}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
-                      {asset.assetCode}
+                      {asset.serial_number}
                     </Link>
                   </td>
                   <td className="py-3 pr-4 font-medium text-gray-700">{asset.item_name}</td>

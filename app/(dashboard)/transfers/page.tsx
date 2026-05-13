@@ -20,6 +20,7 @@ interface Transfer {
 interface AssetOption {
   _id: string;
   assetCode: string;
+  serial_number: string;
   item_name: string;
   branch: string;
   department: string;
@@ -72,7 +73,8 @@ function NewTransferModal({
   const filtered = assets.filter(
     (a) =>
       a.assetCode.toLowerCase().includes(query.toLowerCase()) ||
-      a.item_name.toLowerCase().includes(query.toLowerCase()),
+      a.item_name.toLowerCase().includes(query.toLowerCase())|| 
+      a.serial_number.toLowerCase().includes(query.toLowerCase()),
   );
 
   /** Current value of the selected field on the chosen asset */
@@ -147,7 +149,7 @@ function NewTransferModal({
               >
                 <div>
                   <p className="font-mono text-xs font-bold" style={{ color: 'var(--color-primary)' }}>
-                    {selected.assetCode}
+                    {selected.serial_number}
                   </p>
                   <p className="text-sm font-medium text-gray-800 mt-0.5">{selected.item_name}</p>
                   <p className="text-xs text-gray-400">{selected.branch} · {selected.department}</p>
@@ -184,7 +186,7 @@ function NewTransferModal({
                     >
                       <div className="min-w-0">
                         <span className="font-mono text-xs font-medium" style={{ color: 'var(--color-primary)' }}>
-                          {a.assetCode}
+                          {a.serial_number}
                         </span>
                         <span className="text-sm text-gray-700 ml-2 truncate">{a.item_name}</span>
                       </div>

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
     const [records, total] = await Promise.all([
       Maintenance.find(query)
-        .populate('asset', 'assetCode item_name')
+        .populate('asset', 'assetCode item_name serial_number')
         .sort({ startDate: -1 })
         .skip(skip)
         .limit(limit)
