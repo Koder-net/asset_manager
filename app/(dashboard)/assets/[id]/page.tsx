@@ -165,7 +165,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
               // eslint-disable-next-line @next/next/no-img-element
               <img src={asset.qrCodeData} alt="QR Code" className="w-48 h-48 mx-auto rounded-lg" />
             )}
-            <p className="font-mono text-sm font-semibold mt-3" style={{ color: 'var(--color-primary)' }}>{asset.assetCode}</p>
+            <p className="font-mono text-sm font-semibold mt-3" style={{ color: 'var(--color-primary)' }}>{asset.serial_number}</p>
             <p className="text-xs text-gray-400 mt-1">{asset.category}</p>
             <button onClick={handlePrintQR} className="btn-accent w-full mt-4 justify-center">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

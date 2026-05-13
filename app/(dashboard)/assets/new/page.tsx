@@ -170,8 +170,8 @@ export default function NewAssetPage() {
           <Field label="Model" id="model">
             <input id="model" type="text" value={form.model} onChange={set('model')} className="input-field" placeholder="Model number" />
           </Field>
-          <Field label="Serial Number" id="serial_number">
-            <input id="serial_number" type="text" value={form.serial_number} onChange={set('serial_number')} className="input-field" placeholder="Serial number" />
+          <Field label="Cigas Number" id="serial_number">
+            <input id="serial_number" type="text" value={form.serial_number} onChange={set('serial_number')} className="input-field" placeholder="Cigas number" />
           </Field>
           <Field label="Cost Value (LKR)" id="cost_value">
             <input id="cost_value" type="number" value={form.cost_value} onChange={set('cost_value')} className="input-field" placeholder="0.00" min="0" step="0.01" />

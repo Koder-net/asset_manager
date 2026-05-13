@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 interface Asset {
   _id: string;
   assetCode: string;
+  serial_number: string;
   item_name: string;
   category: string;
   qrCodeData: string;
@@ -121,7 +122,7 @@ function QRPage() {
                   className="rounded"
                 />
                 <div className="min-w-0">
-                  <p className="text-xs font-mono font-medium" style={{ color: 'var(--color-primary)' }}>{asset.assetCode}</p>
+                  <p className="text-xs font-mono font-medium" style={{ color: 'var(--color-primary)' }}>{asset.serial_number}</p>
                   <p className="text-xs text-gray-500 truncate">{asset.item_name}</p>
                 </div>
               </label>
@@ -182,7 +183,7 @@ function QRPage() {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={asset.qrCodeData} alt="QR" className="w-28 h-28 rounded" />
-                    <p className="font-mono text-xs font-bold mt-2" style={{ color: 'var(--color-primary)' }}>{asset.assetCode}</p>
+                    <p className="font-mono text-xs font-bold mt-2" style={{ color: 'var(--color-primary)' }}>{asset.serial_number}</p>
                     <p className="text-xs text-gray-500 mt-0.5 truncate w-full">{asset.item_name}</p>
                     <p className="text-xs mt-1" style={{ color: 'rgba(51,65,55,0.35)', fontSize: '9px' }}>Powered by Kodernet</p>
                   </div>
