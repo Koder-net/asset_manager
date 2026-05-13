@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 interface MaintenanceRecord {
   _id: string;
-  asset: { assetCode: string; item_name: string, serial_number: string };
+  asset: { serial_number: string; item_name: string };
   maintenanceType: string;
   description: string;
   startDate: string;
@@ -17,9 +17,8 @@ interface MaintenanceRecord {
 
 interface AssetOption {
   _id: string;
-  assetCode: string;
-  item_name: string;
   serial_number: string;
+  item_name: string;
 }
 
 const STATUS_BADGE: Record<string, string> = {

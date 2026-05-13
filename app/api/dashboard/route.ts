@@ -22,7 +22,7 @@ export async function GET() {
       Asset.aggregate([{ $group: { _id: '$asset_status', count: { $sum: 1 } } }]),
       Asset.aggregate([{ $group: { _id: '$branch', count: { $sum: 1 } } }, { $sort: { count: -1 } }]),
       Asset.aggregate([{ $group: { _id: '$condition_status', count: { $sum: 1 } } }]),
-      Asset.find().sort({ createdAt: -1 }).limit(5).select('assetCode item_name serial_number category asset_status branch createdAt').lean(),
+      Asset.find().sort({ createdAt: -1 }).limit(5).select('serial_number item_name category asset_status branch createdAt').lean(),
       Asset.countDocuments({ asset_status: 'In Repair' }),
       Asset.countDocuments({ asset_status: 'Missing' }),
     ]);

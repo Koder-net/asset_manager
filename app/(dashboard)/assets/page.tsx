@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 
 interface Asset {
   _id: string;
-  assetCode: string;
   serial_number: string;
   item_name: string;
   category: string;
@@ -184,7 +183,7 @@ export default function AssetsPage() {
                       <input type="checkbox" className="rounded" checked={selected.includes(asset._id)} onChange={() => toggleSelect(asset._id)} />
                     </td>
                     <td className="p-4">
-                      <Link href={`/assets/${asset.assetCode}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
+                      <Link href={`/assets/${asset.serial_number}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
                         {asset.serial_number}
                       </Link>
                     </td>
@@ -197,7 +196,7 @@ export default function AssetsPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-1">
-                        <Link href={`/assets/${asset.assetCode}/edit`} className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600" title="Edit">
+                        <Link href={`/assets/${asset.serial_number}/edit`} className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600" title="Edit">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                           </svg>

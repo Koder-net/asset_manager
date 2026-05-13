@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
     const [records, total] = await Promise.all([
       Maintenance.find(query)
-        .populate('asset', 'assetCode item_name serial_number')
+        .populate('asset', 'serial_number item_name')
         .sort({ startDate: -1 })
         .skip(skip)
         .limit(limit)
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     const asset = await Asset.findById(assetId);
     await logAudit(session, 'MAINTENANCE', 'Asset', {
       entityId: assetId,
-      entityCode: asset?.assetCode,
+      entityCode: asset?.serial_number,
       changes: { maintenanceType, status },
       request,
     });

@@ -33,13 +33,6 @@ export async function logAudit(
   }
 }
 
-export function generateAssetCode(category: string, count: number): string {
-  const prefix = category.slice(0, 3).toUpperCase().replace(/\s/g, '');
-  const year = new Date().getFullYear().toString().slice(-2);
-  const seq = String(count + 1).padStart(5, '0');
-  return `${prefix}-${year}-${seq}`;
-}
-
 export function generateBatchNumber(): string {
   const now = new Date();
   const datePart = now.toISOString().slice(0, 10).replace(/-/g, '');

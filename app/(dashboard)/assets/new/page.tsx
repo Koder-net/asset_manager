@@ -113,7 +113,7 @@ export default function NewAssetPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        router.push(`/assets/${data.asset.assetCode}`);
+        router.push(`/assets/${data.asset.serial_number}`);
       } else {
         setError(data.error || 'Failed to create asset');
       }

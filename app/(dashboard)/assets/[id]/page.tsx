@@ -6,13 +6,12 @@ import { useRouter } from 'next/navigation';
 
 interface Asset {
   _id: string;
-  assetCode: string;
+  serial_number: string;
   qrCodeData: string;
   item_name: string;
   category: string;
   brand?: string;
   model?: string;
-  serial_number?: string;
   source?: string;
   supplier_name?: string;
   invoice_number?: string;
@@ -74,7 +73,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
     const win = window.open('', '_blank');
     if (!win) return;
     win.document.write(`
-      <html><head><title>QR - ${asset.assetCode}</title>
+      <html><head><title>QR - ${asset.serial_number}</title>
       <style>
         body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .qr-card { border: 2px solid #334137; padding: 20px; border-radius: 12px; text-align: center; max-width: 280px; }
@@ -86,7 +85,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
       <body>
         <div class="qr-card">
           <img src="${asset.qrCodeData}" alt="QR Code" />
-          <div class="code">${asset.assetCode}</div>
+          <div class="code">${asset.serial_number}</div>
           <div class="name">${asset.item_name}</div>
           <div class="footer">Powered by Kodernet</div>
         </div>
@@ -127,7 +126,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
               <h1 className="text-xl font-bold" style={{ color: 'var(--color-primary-dark)' }}>{asset.item_name}</h1>
               <span className={STATUS_BADGE[asset.asset_status] || 'badge badge-storage'}>{asset.asset_status}</span>
             </div>
-            <p className="text-sm font-mono text-gray-500">{asset.assetCode}</p>
+            <p className="text-sm font-mono text-gray-500">{asset.serial_number}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -146,7 +145,7 @@ export default function AssetDetailPage({ params }: { params: Promise<{ id: stri
             Print QR
           </button>
           {userRole && !['auditor', 'viewer'].includes(userRole) && (
-            <Link href={`/assets/${asset.assetCode}/edit`} className="btn-primary">
+            <Link href={`/assets/${asset.serial_number}/edit`} className="btn-primary">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
               </svg>

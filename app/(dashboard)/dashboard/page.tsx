@@ -13,9 +13,8 @@ interface DashboardData {
   byBranch: { _id: string; count: number }[];
   byCondition: { _id: string; count: number }[];
   recentAssets: {
-    assetCode: string;
-    item_name: string;
     serial_number: string;
+    item_name: string;
     category: string;
     asset_status: string;
     branch: string;
@@ -219,9 +218,9 @@ export default function DashboardPage() {
             </thead>
             <tbody>
               {data.recentAssets.map((asset) => (
-                <tr key={asset.assetCode} className="table-row-hover border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
+                <tr key={asset.serial_number} className="table-row-hover border-b last:border-0" style={{ borderColor: 'var(--color-border)' }}>
                   <td className="py-3 pr-4">
-                    <Link href={`/assets/${asset.assetCode}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
+                    <Link href={`/assets/${asset.serial_number}`} className="font-mono text-xs font-medium hover:underline" style={{ color: 'var(--color-primary)' }}>
                       {asset.serial_number}
                     </Link>
                   </td>

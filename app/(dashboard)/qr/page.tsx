@@ -5,7 +5,6 @@ import { useSearchParams } from 'next/navigation';
 
 interface Asset {
   _id: string;
-  assetCode: string;
   serial_number: string;
   item_name: string;
   category: string;
@@ -88,7 +87,7 @@ function QRPage() {
         Array.from({ length: copies }).map(() => `
           <div class="qr-card">
             <img src="${asset.qrCodeData}" alt="QR" />
-            <div class="code">${asset.assetCode}</div>
+            <div class="code">${asset.serial_number}</div>
             <div class="name">${asset.item_name}</div>
             <div class="footer">Powered by Kodernet</div>
           </div>

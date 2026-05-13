@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const [transfers, total] = await Promise.all([
       Transfer.find(query)
-        .populate('asset', 'assetCode item_name')
+        .populate('asset', 'serial_number item_name')
         .populate('createdBy', 'name')
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     await logAudit(session, 'TRANSFER', 'Asset', {
       entityId: assetId,
-      entityCode: asset.assetCode,
+      entityCode: asset.serial_number,
       changes: { transferType, fromValue, toValue },
       request,
     });

@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all data in parallel
     const [assets, transfers, maintenances] = await Promise.all([
-      Asset.find(assetQuery).sort({ assetCode: 1 }).lean(),
+      Asset.find(assetQuery).sort({ serial_number: 1 }).lean(),
       Transfer.find({}).sort({ transferDate: -1 }).lean(),
       Maintenance.find({}).sort({ startDate: -1 }).lean(),
     ]);
@@ -102,12 +102,11 @@ export async function GET(request: NextRequest) {
     });
 
     const assetCols = [
-      { header: 'Asset Code',    key: 'assetCode',       width: 16 },
+      { header: 'Cigas Number',  key: 'serial_number',   width: 20 },
       { header: 'Item Name',     key: 'item_name',       width: 28 },
       { header: 'Category',      key: 'category',        width: 18 },
       { header: 'Brand',         key: 'brand',           width: 16 },
       { header: 'Model',         key: 'model',           width: 18 },
-      { header: 'Serial No.',    key: 'serial_number',   width: 20 },
       { header: 'Branch',        key: 'branch',          width: 16 },
       { header: 'Department',    key: 'department',      width: 18 },
       { header: 'Location',      key: 'location',        width: 18 },
@@ -148,12 +147,11 @@ export async function GET(request: NextRequest) {
       const fmt = (d?: Date) => d ? new Date(d).toLocaleDateString('en-US') : '';
 
       const values = [
-        a.assetCode,
+        a.serial_number,
         a.item_name,
         a.category,
         a.brand ?? '',
         (a as { model?: string }).model ?? '',
-        a.serial_number ?? '',
         a.branch,
         a.department,
         a.location,
@@ -176,7 +174,7 @@ export async function GET(request: NextRequest) {
         cell.value = v as ExcelJS.CellValue;
         Object.assign(cell, cellStyle(alt));
         // Status colour coding
-        if (ci === 10) {
+        if (ci === 9) {
           const statusColors: Record<string, string> = {
             'Active':      '1a7a36',
             'In Storage':  '8a6a1a',
@@ -192,7 +190,7 @@ export async function GET(request: NextRequest) {
           }
         }
         // Condition colour coding
-        if (ci === 11) {
+        if (ci === 10) {
           const condColors: Record<string, string> = {
             'Excellent': '1a7a36',
             'Good':      '3a7a3a',
@@ -207,7 +205,7 @@ export async function GET(request: NextRequest) {
           }
         }
         // Cost value formatting
-        if (ci === 15 && typeof v === 'number') {
+        if (ci === 14 && typeof v === 'number') {
           cell.numFmt = '#,##0.00';
         }
       });
@@ -218,8 +216,8 @@ export async function GET(request: NextRequest) {
           const base64 = a.qrCodeData.replace('data:image/png;base64,', '');
           const imgId = wb.addImage({ base64, extension: 'png' });
           wsAssets.addImage(imgId, {
-            tl: { col: 19, row: rowIdx - 1 } as ExcelJS.Anchor,   // col 20 = QR column
-            br: { col: 20, row: rowIdx } as ExcelJS.Anchor,
+            tl: { col: 18, row: rowIdx - 1 } as ExcelJS.Anchor,   // col 19 = QR column
+            br: { col: 19, row: rowIdx } as ExcelJS.Anchor,
             editAs: 'oneCell',
           });
         } catch {
@@ -243,7 +241,7 @@ export async function GET(request: NextRequest) {
     });
 
     const transferCols = [
-      { header: 'Asset Code',     key: 'assetCode',    width: 16 },
+      { header: 'Cigas Number',   key: 'serial_number', width: 20 },
       { header: 'Asset Name',     key: 'item_name',    width: 28 },
       { header: 'Transfer Type',  key: 'transferType', width: 18 },
       { header: 'From',           key: 'fromValue',    width: 24 },
@@ -279,7 +277,7 @@ export async function GET(request: NextRequest) {
       row.height = 22;
 
       const rowVals = [
-        asset?.assetCode ?? t.asset.toString(),
+        asset?.serial_number ?? t.asset.toString(),
         asset?.item_name ?? '—',
         t.transferType.charAt(0).toUpperCase() + t.transferType.slice(1),
         t.fromValue,
@@ -325,7 +323,7 @@ export async function GET(request: NextRequest) {
     });
 
     const maintCols = [
-      { header: 'Asset Code',       key: 'assetCode',       width: 16 },
+      { header: 'Cigas Number',      key: 'serial_number',   width: 20 },
       { header: 'Asset Name',       key: 'item_name',       width: 28 },
       { header: 'Maintenance Type', key: 'maintenanceType', width: 20 },
       { header: 'Description',      key: 'description',     width: 36 },
@@ -359,7 +357,7 @@ export async function GET(request: NextRequest) {
       row.height = 22;
 
       const rowVals = [
-        asset?.assetCode ?? m.asset.toString(),
+        asset?.serial_number ?? m.asset.toString(),
         asset?.item_name ?? '—',
         m.maintenanceType,
         m.description,

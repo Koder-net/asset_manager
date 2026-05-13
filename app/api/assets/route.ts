@@ -1,7 +1,7 @@
 import { connectDB } from '@/lib/db';
 import Asset from '@/models/Asset';
 import { requireAuth } from '@/lib/auth';
-import { logAudit, generateAssetCode } from '@/lib/utils';
+import { logAudit } from '@/lib/utils';
 import { NextRequest } from 'next/server';
 import QRCode from 'qrcode';
 
@@ -26,7 +26,6 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       query.$or = [
-        { assetCode: { $regex: search, $options: 'i' } },
         { item_name: { $regex: search, $options: 'i' } },
         { serial_number: { $regex: search, $options: 'i' } },
       ];
@@ -62,8 +61,6 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const body = await request.json();
-    const count = await Asset.countDocuments();
-    const assetCode = generateAssetCode(body.category || 'GEN', count);
 
     // Use the explicit env var first; fall back to the origin of the incoming
     // request so QR codes always point to the actual deployment (Vercel, etc.)
@@ -71,7 +68,7 @@ export async function POST(request: NextRequest) {
     const appUrl =
       process.env.NEXT_PUBLIC_APP_URL ||
       `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-    const qrUrl = `${appUrl}/assets/${assetCode}`;
+    const qrUrl = `${appUrl}/assets/${body.serial_number}`;
     const qrCodeData = await QRCode.toDataURL(qrUrl, {
       errorCorrectionLevel: 'H',
       margin: 1,
@@ -80,14 +77,13 @@ export async function POST(request: NextRequest) {
 
     const asset = await Asset.create({
       ...body,
-      assetCode,
       qrCodeData,
       createdBy: session.userId,
     });
 
     await logAudit(session, 'CREATE', 'Asset', {
       entityId: asset._id.toString(),
-      entityCode: assetCode,
+      entityCode: body.serial_number,
       changes: { item_name: body.item_name, category: body.category },
       request,
     });

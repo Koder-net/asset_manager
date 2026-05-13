@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 interface Transfer {
   _id: string;
-  asset: { _id: string; assetCode: string; item_name: string };
+  asset: { _id: string; serial_number: string; item_name: string };
   transferType: string;
   fromValue: string;
   toValue: string;
@@ -19,7 +19,6 @@ interface Transfer {
 
 interface AssetOption {
   _id: string;
-  assetCode: string;
   serial_number: string;
   item_name: string;
   branch: string;
@@ -72,9 +71,8 @@ function NewTransferModal({
 
   const filtered = assets.filter(
     (a) =>
-      a.assetCode.toLowerCase().includes(query.toLowerCase()) ||
-      a.item_name.toLowerCase().includes(query.toLowerCase())|| 
-      a.serial_number.toLowerCase().includes(query.toLowerCase()),
+      a.serial_number.toLowerCase().includes(query.toLowerCase()) ||
+      a.item_name.toLowerCase().includes(query.toLowerCase()),
   );
 
   /** Current value of the selected field on the chosen asset */
@@ -466,11 +464,11 @@ function TransfersContent() {
                 >
                   <td className="p-4">
                     <Link
-                      href={`/assets/${t.asset?.assetCode}`}
+                      href={`/assets/${t.asset?.serial_number}`}
                       className="font-mono text-xs font-semibold hover:underline"
                       style={{ color: 'var(--color-primary)' }}
                     >
-                      {t.asset?.assetCode}
+                      {t.asset?.serial_number}
                     </Link>
                     <p className="text-xs text-gray-500 mt-0.5 max-w-[160px] truncate">
                       {t.asset?.item_name}

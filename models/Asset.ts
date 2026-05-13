@@ -4,13 +4,12 @@ import mongoose, { Schema, Model, HydratedDocument } from 'mongoose';
 // between our `model` field (device model name) and Mongoose's `.model()` method.
 export interface IAsset {
   _id: mongoose.Types.ObjectId;
-  assetCode: string;
+  serial_number: string;
   qrCodeData: string;
   item_name: string;
   category: string;
   brand?: string;
   model?: string;          // e.g. "Dell XPS 15" — would clash with Document.model()
-  serial_number?: string;
   source?: string;
   supplier_name?: string;
   invoice_number?: string;
@@ -38,13 +37,12 @@ export type AssetDocument = HydratedDocument<IAsset>;
 
 const AssetSchema = new Schema<IAsset>(
   {
-    assetCode:        { type: String, required: true, unique: true, index: true },
+    serial_number:    { type: String, required: true, unique: true, trim: true },
     qrCodeData:       { type: String, required: true },
     item_name:        { type: String, required: true, trim: true },
     category:         { type: String, required: true, trim: true },
     brand:            { type: String, trim: true },
     model:            { type: String, trim: true },
-    serial_number:    { type: String, trim: true },
     source:           { type: String, trim: true },
     supplier_name:    { type: String, trim: true },
     invoice_number:   { type: String, trim: true },
@@ -76,7 +74,7 @@ const AssetSchema = new Schema<IAsset>(
   { timestamps: true }
 );
 
-AssetSchema.index({ item_name: 'text', serial_number: 'text', assetCode: 'text' });
+AssetSchema.index({ item_name: 'text', serial_number: 'text' });
 AssetSchema.index({ category: 1, branch: 1, department: 1, asset_status: 1 });
 
 const Asset: Model<IAsset> = mongoose.models.Asset || mongoose.model<IAsset>('Asset', AssetSchema);

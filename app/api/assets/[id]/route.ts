@@ -14,7 +14,7 @@ export async function GET(
     const { id } = await params;
     await connectDB();
     const asset = await Asset.findOne({
-      $or: [{ _id: id.match(/^[0-9a-f]{24}$/i) ? id : null }, { assetCode: id }],
+      $or: [{ _id: id.match(/^[0-9a-f]{24}$/i) ? id : null }, { serial_number: id }],
     });
     if (!asset) return Response.json({ error: 'Asset not found' }, { status: 404 });
     return Response.json({ asset, userRole: session.role });
@@ -55,7 +55,7 @@ export async function PUT(
 
     await logAudit(session, 'UPDATE', 'Asset', {
       entityId: id,
-      entityCode: existing.assetCode,
+      entityCode: existing.serial_number,
       changes,
       request,
     });
@@ -83,7 +83,7 @@ export async function DELETE(
 
     await logAudit(session, 'DELETE', 'Asset', {
       entityId: id,
-      entityCode: asset.assetCode,
+      entityCode: asset.serial_number,
       request,
     });
 

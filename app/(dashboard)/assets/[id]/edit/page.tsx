@@ -81,7 +81,7 @@ export default function EditAssetPage({ params }: { params: Promise<{ id: string
         body: JSON.stringify({ ...form, cost_value: form.cost_value ? parseFloat(form.cost_value) : undefined }),
       });
       if (res.ok) {
-        router.push(`/assets/${id}`);
+        router.push(`/assets/`);
       } else {
         const d = await res.json();
         setError(d.error || 'Failed to update');

@@ -11,7 +11,7 @@ export async function GET() {
     await requireAuth();
     await connectDB();
     const batches = await QRBatch.find()
-      .populate('assets', 'assetCode item_name')
+      .populate('assets', 'serial_number item_name')
       .sort({ createdAt: -1 })
       .limit(50)
       .lean();
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Asset IDs required' }, { status: 400 });
     }
 
-    const assets = await Asset.find({ _id: { $in: assetIds } }).select('assetCode qrCodeData item_name');
+    const assets = await Asset.find({ _id: { $in: assetIds } }).select('serial_number qrCodeData item_name');
     const batchNumber = generateBatchNumber();
 
     const batch = await QRBatch.create({
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     return Response.json({
       batch,
       assets: assets.map((a) => ({
-        assetCode: a.assetCode,
+        serial_number: a.serial_number,
         item_name: a.item_name,
         qrCodeData: a.qrCodeData,
       })),
